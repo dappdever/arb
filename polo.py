@@ -21,6 +21,9 @@ class Polo (Exchange):
         self.polon.key = config['polo']['key']
         self.polon.secret = config['polo']['secret']
     
+    def get_exchange_name (self):
+        return "Poloniex"
+   
     def short_crypto (self, _crypto, _quantity, _price):
         symbol = "USDT_" + _crypto
         if trade:
@@ -33,6 +36,15 @@ class Polo (Exchange):
             order = self.polon.buy(symbol, _price, _quantity)
         logger.info ("Poloniex short " + _crypto + ". Quantity: " + Util.float_to_str(_quantity) + ", Price: " + str(_price))
 
+    def get_balances(self):
+        balances = self.polon.returnBalances()
+        non_zero_balances = {}
+        for key, value in balances.items():
+            if float(value) > 0:
+                non_zero_balances[key] = float(value)
+        return non_zero_balances
+
+
     def get_balance_usd (self):
         balance = float(self.polon.returnTicker()['USDT_ETH']['last']) * float (self.polon.returnBalances()['ETH'])
         balance = balance + float(self.polon.returnTicker()['USDT_DASH']['last']) * float (self.polon.returnBalances()['DASH'])
@@ -43,7 +55,7 @@ class Polo (Exchange):
         return balance  
 
     def get_lowest_ask (self, _crypto):
-        asks = self.polon.returnOrderBook()['USDT_BCH']['asks']
+        asks = self.polon.returnOrderBook()['USDT_' + _crypto]['asks']
         lowestAsk = 10000000
         for ask in asks:
             ask_price = float(ask[0])
@@ -52,7 +64,7 @@ class Polo (Exchange):
         return lowestAsk
 
     def get_highest_bid (self, _crypto):
-        bids = self.polon.returnOrderBook()['USDT_BCH']['bids']
+        bids = self.polon.returnOrderBook()['USDT_' + _crypto]['bids']
         highest_bid = 0
         for bid in bids:
             bid_price = float(bid[0])
@@ -60,3 +72,8 @@ class Polo (Exchange):
                 highest_bid = bid_price
         return highest_bid
 
+    def get_make_fee(self):
+        return 0.0015
+
+    def get_take_fee(self):
+        return 0.0025

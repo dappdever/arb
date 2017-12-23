@@ -19,6 +19,9 @@ class HitBTC (Exchange):
     def __init__(self): 
         self.hit_client =  Client("https://api.hitbtc.com", config["hitbtc"]["key"], config["hitbtc"]["secret"])
     
+    def get_exchange_name(self):
+        return "HitBTC"
+    
     def get_balance_usd (self):
         balances = self.hit_client.get_trading_balance()
         usd_balance = 0
@@ -38,6 +41,13 @@ class HitBTC (Exchange):
                 usd_balance = usd_balance + float(balance['available'])
         return usd_balance
 
+    def get_balances (self):
+        balances = self.hit_client.get_trading_balance()
+        non_zero_balances = {}
+        for balance in balances:
+            if float(balance['available']) + float(balance['reserved']) > 0:
+                non_zero_balances[balance['currency']] = float(balance['available']) + float(balance['reserved'])
+        return non_zero_balances
 
     def get_balance (self, _crypto):
         balances = self.hit_client.get_trading_balance()
@@ -65,3 +75,8 @@ class HitBTC (Exchange):
         return highest_bid
 
 
+    def get_make_fee(self):
+        return 0.0001
+
+    def get_take_fee(self):
+        return 0.0001
