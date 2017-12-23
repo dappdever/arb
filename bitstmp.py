@@ -58,6 +58,7 @@ class Bitstmp (Exchange):
                 highest_bid = bid_price
         return highest_bid
 
+    
     def get_balance_usd (self):
         balance = float(self.trading_client.account_balance(base="eth")['eth_balance']) * float(self.public_client.order_book(base="eth")["asks"][0][0])           
         balance = balance + float(self.trading_client.account_balance(base="btc")['btc_balance']) * float(self.public_client.order_book(base="btc")["asks"][0][0])
